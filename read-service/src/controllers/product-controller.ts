@@ -11,9 +11,12 @@ export type Query = {
 }
 
 const buildQuery = (req: Request): Query => {
+  const userId = req.user.id || 'anonymous'
+  if (!req.query) return { userId }
+
   const { name, branch, color } = req.query as { name: string, branch: string, color: string }
 
-  const query: Query = { userId: 'loggedUser' }
+  const query: Query = { userId }
   if (name) query.name = name
   if (branch) query.branch = branch
   if (color) query.color = color
@@ -27,11 +30,10 @@ const ProductController = {
       const { params } = req
       const doc: Product = await ProductModel.findById({ _id: params.id })
 
+      const query: Query = buildQuery(req)
+      query.docId = params.id
+
       // publish `FILTER_PRODUCT` event to redis
-      const query: Query = {
-        userId: 'loggedUser',
-        docId: params.id,
-      }
       pubEvent('FILTER_PRODUCT', query)
 
       res.status(200).json({ result: doc })
@@ -42,7 +44,7 @@ const ProductController = {
   findAll: async (req: Request, res: Response): Promise<void> => {
     try {
       const query = buildQuery(req)
-      const docs: Product[] = await ProductModel.find(query).exec()
+      const docs: Product[] = await ProductModel.find(query)
 
       // publish `VIEW_PRODUCT` event to redis
       pubEvent(

@@ -1,13 +1,13 @@
 import { Schema, model } from 'mongoose'
 
 export interface Product {
-  _id: string
+  _id?: string
   name: string
   price: string
   branch: string
   color: string
-  createdAt: Date
-  updatedAt: Date
+  createdAt?: Date
+  updatedAt?: Date
 }
 
 const schema = new Schema<Product>(

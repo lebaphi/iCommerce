@@ -69,11 +69,11 @@ Examples of data stored in the MongoDB or pusblished to Redis.
 {
     "_id": "61434e6b111b3f60e3df7a77",
     "eventName": "FILTER_PRODUCT",
-    "userId": "anonymous",
     "metadata" : {
       query: {
         name: "Iphone 13",
-        color: "Blue"
+        color: "Blue",
+        userId: "anonymous" | "loggedIn user",
       }
     },
     "__v": 0,
@@ -91,7 +91,8 @@ Examples of data stored in the MongoDB or pusblished to Redis.
     "userId": "anonymous",
     "metadata" : {
       query: {
-        productId: "6140c1126050d69edb35a174"
+        docId: "6140c1126050d69edb35a174",
+        userId: "anonymous" | "loggedIn user",
       }
     },
     "__v": 0,
