@@ -40,6 +40,8 @@ describe('Test Product Controller', () => {
     publisherStub.mockRestore()
   })
 
+  afterAll(() => publisher.publisher.quit())
+
   test('should filter product by id success', async () => {
     mockingoose(ProductModel).toReturn(mockData[0], 'findOne')
 
