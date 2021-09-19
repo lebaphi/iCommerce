@@ -23,12 +23,14 @@ describe('Test Product Controller', () => {
         price: '$400',
         branch: 'Apple',
         color: 'blue',
+        deleted: false
       },
       {
         name: 'Iphone 12',
         price: '$500',
         branch: 'Apple',
         color: 'white',
+        deleted: false
       }
     ]
     publisherStub = jest.spyOn(publisher, 'pubEvent').mockReturnValue(true)

@@ -11,30 +11,30 @@ export type Query = {
 }
 
 const buildQuery = (req: Request): Query => {
-  const userId = req.user.id || 'anonymous'
-  if (!req.query) return { userId }
+  const userId = req?.user?.id || 'loggedUser'
+  const defaultQuery: Query = { userId }
+
+  if (!req.query) return defaultQuery
 
   const { name, branch, color } = req.query as { name: string, branch: string, color: string }
+  if (name) defaultQuery.name = name
+  if (branch) defaultQuery.branch = branch
+  if (color) defaultQuery.color = color
 
-  const query: Query = { userId }
-  if (name) query.name = name
-  if (branch) query.branch = branch
-  if (color) query.color = color
-
-  return query
+  return defaultQuery
 }
 
 const ProductController = {
   findById: async (req: Request, res: Response): Promise<void> => {
     try {
       const { params } = req
-      const doc: Product = await ProductModel.findById({ _id: params.id })
-
-      const query: Query = buildQuery(req)
-      query.docId = params.id
+      const doc: Product = await ProductModel.findOne({ _id: params.id, deleted: false })
 
       // publish `FILTER_PRODUCT` event to redis
-      pubEvent('FILTER_PRODUCT', query)
+      pubEvent('FILTER_PRODUCT', {
+        userId: req?.user?.id || 'loggedUser',
+        docId: params.id
+      })
 
       res.status(200).json({ result: doc })
     } catch (err) {
@@ -44,7 +44,7 @@ const ProductController = {
   findAll: async (req: Request, res: Response): Promise<void> => {
     try {
       const query = buildQuery(req)
-      const docs: Product[] = await ProductModel.find(query)
+      const docs: Product[] = await ProductModel.find({ ...query, deleted: false })
 
       // publish `VIEW_PRODUCT` event to redis
       pubEvent(
